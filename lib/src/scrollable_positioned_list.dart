@@ -656,8 +656,8 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
           context,
           itemPositions.reduce((value, element) =>
               value.itemLeadingEdge < element.itemLeadingEdge
-                  ? value
-                  : element));
+                  ? value as ItemPosition
+                  : element as ItemPosition));
     }
     widget.itemPositionsNotifier?.itemPositions.value = itemPositions;
   }
