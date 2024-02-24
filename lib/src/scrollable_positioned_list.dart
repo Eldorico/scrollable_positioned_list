@@ -16,7 +16,7 @@ import 'post_mount_callback.dart';
 import 'scroll_offset_notifier.dart';
 
 /// Number of screens to scroll when scrolling a long distance.
-const int _screenScrollCount = 100;
+const int _screenScrollCount = 2;
 
 /// A scrollable list of widgets similar to [ListView], except scroll control
 /// and position reporting is based on index rather than pixel offset.
