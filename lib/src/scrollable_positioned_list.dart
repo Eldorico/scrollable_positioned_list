@@ -16,7 +16,7 @@ import 'post_mount_callback.dart';
 import 'scroll_offset_notifier.dart';
 
 /// Number of screens to scroll when scrolling a long distance.
-const int _screenScrollCount = 2;
+const int _screenScrollCount = 100;
 
 /// A scrollable list of widgets similar to [ListView], except scroll control
 /// and position reporting is based on index rather than pixel offset.
@@ -45,6 +45,7 @@ class ScrollablePositionedList extends StatefulWidget {
     this.shrinkWrap = false,
     ItemPositionsListener? itemPositionsListener,
     this.scrollOffsetController,
+    this.customScrollController,
     ScrollOffsetListener? scrollOffsetListener,
     this.initialScrollIndex = 0,
     this.initialAlignment = 0,
@@ -75,6 +76,7 @@ class ScrollablePositionedList extends StatefulWidget {
     this.itemScrollController,
     ItemPositionsListener? itemPositionsListener,
     this.scrollOffsetController,
+    this.customScrollController,
     ScrollOffsetListener? scrollOffsetListener,
     this.initialScrollIndex = 0,
     this.initialAlignment = 0,
@@ -100,6 +102,8 @@ class ScrollablePositionedList extends StatefulWidget {
   /// Called to build children for the list with
   /// 0 <= index < itemCount.
   final IndexedWidgetBuilder itemBuilder;
+
+  final ScrollController ? customScrollController;
 
   /// Called to build separators for between each item in the list.
   /// Called with 0 <= index < itemCount - 1.
@@ -187,7 +191,8 @@ class ScrollablePositionedList extends StatefulWidget {
   final double? minCacheExtent;
 
   @override
-  State<StatefulWidget> createState() => _ScrollablePositionedListState();
+  State<StatefulWidget> createState() => _ScrollablePositionedListState(customScrollController: customScrollController);
+
 }
 
 /// Controller to jump or scroll to a particular position in a
@@ -307,8 +312,12 @@ class ScrollOffsetController {
 
 class _ScrollablePositionedListState extends State<ScrollablePositionedList>
     with TickerProviderStateMixin {
+
+  _ScrollablePositionedListState({ScrollController? customScrollController}){
+    this.primary = _ListDisplayDetails(const ValueKey('Ping'), customScrollController: customScrollController);
+  }
   /// Details for the primary (active) [ListView].
-  var primary = _ListDisplayDetails(const ValueKey('Ping'));
+  var primary;
 
   /// Details for the secondary (transitional) [ListView] that is temporarily
   /// shown when scrolling a long distance.
@@ -655,10 +664,11 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
 }
 
 class _ListDisplayDetails {
-  _ListDisplayDetails(this.key);
+  _ListDisplayDetails(this.key, {ScrollController ? customScrollController } ):
+        scrollController = customScrollController ?? ScrollController(keepScrollOffset: false) ;
 
   final itemPositionsNotifier = ItemPositionsNotifier();
-  final scrollController = ScrollController(keepScrollOffset: false);
+  final scrollController;// = customScrollController ?? ScrollController(keepScrollOffset: false) ;
 
   /// The index of the item to scroll to.
   int target = 0;
