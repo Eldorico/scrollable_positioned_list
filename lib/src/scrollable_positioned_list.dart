@@ -501,7 +501,7 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
       index = widget.itemCount - 1;
     }
     setState(() {
-      primary.scrollController.jumpTo(0);
+      primary.scrollController.jumpTo(0.0);
       primary.target = index;
       primary.alignment = alignment;
     });
@@ -550,9 +550,13 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
     required List<double> opacityAnimationWeights,
   }) async {
     final direction = index > primary.target ? 1 : -1;
-    final itemPosition = primary.itemPositionsNotifier.itemPositions.value
-        .firstWhereOrNull(
-            (ItemPosition itemPosition) => itemPosition.index == index);
+
+    var itemPosition = null;
+    try{
+      var itemPosition = primary.itemPositionsNotifier.itemPositions.value.firstWhere(
+              (ItemPosition itemPosition) => itemPosition.index == index);
+    }on StateError{}
+
     if (itemPosition != null) {
       // Scroll directly.
       final localScrollAmount = itemPosition.itemLeadingEdge *
@@ -587,7 +591,7 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
               duration: duration,
               curve: curve));
           endCompleter.complete(secondary.scrollController
-              .animateTo(0, duration: duration, curve: curve));
+              .animateTo(0.0, duration: duration, curve: curve));
         });
       };
       setState(() {
